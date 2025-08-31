@@ -2,37 +2,86 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "hebrew-date-zmanim",
   "title": "Hebrew Date & Zmanim",
-  "description": "Convert Gregorian ↔ Hebrew dates and calculate Kosher Zmanim (halachic times). Includes fuzzy search for zmanim.",
+  "description": "Hebrew date converter + full Kosher Zmanim with fuzzy search for Raycast.",
   "icon": "extension-icon.png",
   "author": "mendel_g",
+  "categories": ["productivity"],
   "license": "MIT",
   "commands": [
     {
-      "name": "hebrew-date-zmanim",
-      "title": "Hebrew Date & Zmanim",
-      "subtitle": "Hebrew date conversion and full zmanim lookup",
-      "description": "Convert between Hebrew and Gregorian dates and calculate Kosher Zmanim. Includes fuzzy search across zmanim.",
-      "mode": "no-view"
+      "name": "to-hebrew",
+      "title": "Gregorian → Hebrew",
+      "subtitle": "Convert a civil date to a Hebrew date",
+      "description": "Pick a date and get its Hebrew equivalent",
+      "mode": "view",
+      "keywords": ["hebrew", "jewish", "luach", "convert"],
+      "arguments": [],
+      "preferences": [
+        {
+          "name": "afterSunsetShift",
+          "title": "Treat selected time as after sunset (beyn hashmashot)",
+          "type": "checkbox",
+          "default": false,
+          "description": "If checked, add 1 day before converting (simple approximation)."
+        }
+      ]
+    },
+    {
+      "name": "to-gregorian",
+      "title": "Hebrew → Gregorian",
+      "subtitle": "Convert a Hebrew date to a civil date",
+      "description": "Enter a Hebrew date (e.g., 7 Elul 5785 or כ\"\"ז בתמוז תשפ\"\"ג)",
+      "mode": "view",
+      "keywords": ["hebrew", "jewish", "luach", "convert"],
+      "arguments": []
+    },
+    {
+      "name": "today-hebrew",
+      "title": "Today in Hebrew (Menu Bar)",
+      "subtitle": "Show today's Hebrew date",
+      "description": "Displays today's Hebrew date in the menu bar.",
+      "mode": "menuBar",
+      "keywords": ["hebrew", "today"],
+      "arguments": [],
+      "preferences": [
+        {
+          "name": "menuAfterSunsetShift",
+          "title": "After sunset shift",
+          "type": "checkbox",
+          "default": true,
+          "description": "Simple +1-day shift to approximate the Hebrew day starting at sundown."
+        }
+      ]
+    },
+    {
+      "name": "zmanim",
+      "title": "Kosher Zmanim (Fuzzy Search)",
+      "subtitle": "Compute halachic times for a date & location",
+      "description": "Powered by kosher-zmanim. Search/Copy all zmanim.",
+      "mode": "view",
+      "keywords": ["zmanim", "sunrise", "sunset", "shof zman", "tallis"],
+      "arguments": []
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.102.6",
-    "@raycast/utils": "^1.17.0"
+    "@hebcal/hdate": "^0.14.4",
+    "@raycast/api": "^1.75.0",
+    "fuse.js": "^7.0.0",
+    "kosher-zmanim": "^0.6.0",
+    "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^2.0.4",
-    "@types/node": "22.13.10",
-    "@types/react": "19.0.10",
-    "eslint": "^9.22.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "@types/node": "^20.11.30",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    
+    "typescript": "^5.4.2"
   },
   "scripts": {
-    "build": "ray build",
+    "build": "ray build -e dist",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
-    "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
     "publish": "npx @raycast/api@latest publish"
   }
 }
