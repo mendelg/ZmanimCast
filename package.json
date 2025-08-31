@@ -36,31 +36,20 @@
       "arguments": []
     },
     {
-      "name": "today-hebrew",
-      "title": "Today in Hebrew (Menu Bar)",
-      "subtitle": "Show today's Hebrew date",
-      "description": "Displays today's Hebrew date in the menu bar.",
-      "mode": "menuBar",
-      "keywords": ["hebrew", "today"],
-      "arguments": [],
-      "preferences": [
-        {
-          "name": "menuAfterSunsetShift",
-          "title": "After sunset shift",
-          "type": "checkbox",
-          "default": true,
-          "description": "Simple +1-day shift to approximate the Hebrew day starting at sundown."
-        }
-      ]
+      "name": "setup-location",
+      "title": "Setup Location",
+      "subtitle": "Set your location for zmanim calculations",
+      "description": "Search and save your location for Today's Zmanim command.",
+      "mode": "view",
+      "keywords": ["setup", "location", "address", "configure"]
     },
     {
-      "name": "zmanim",
-      "title": "Kosher Zmanim (Fuzzy Search)",
-      "subtitle": "Compute halachic times for a date & location",
-      "description": "Powered by kosher-zmanim. Search/Copy all zmanim.",
+      "name": "zmanim-today",
+      "title": "Today's Zmanim",
+      "subtitle": "All zmanim for today with fuzzy search",
+      "description": "Shows all zmanim for today using your saved location. Searchable and copyable.",
       "mode": "view",
-      "keywords": ["zmanim", "sunrise", "sunset", "shof zman", "tallis"],
-      "arguments": []
+      "keywords": ["zmanim", "today", "alos", "netz", "shkia", "tzais", "plag"]
     }
   ],
   "dependencies": {
