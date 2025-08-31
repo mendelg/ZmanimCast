@@ -1,51 +1,62 @@
 import { Action, ActionPanel, Detail, Form, Icon, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { HDate } from "@hebcal/hdate";
+import { JewishDate } from "kosher-zmanim";
 
 export default function Command() {
   const [input, setInput] = useState<string>("");
   const { push } = useNavigation();
 
-  function parseHebrewDate(str: string): HDate | null {
+  function parseHebrewDate(str: string): JewishDate | null {
     const s = str.trim();
     if (!s) return null;
-
-    try {
-      // @ts-ignore
-      const maybe = HDate.fromGematriyaString?.(s);
-      if (maybe && // @ts-ignore
-          (maybe.getFullYear?.() || maybe.getFullYear)) return maybe as HDate;
-    } catch {}
 
     const parts = s.replace(/[,:\-/]/g, " ").split(" ").filter(Boolean);
     if (parts.length >= 3) {
       const day = parseInt(parts[0], 10);
-      const month = parts.slice(1, parts.length - 1).join(" ");
+      const monthName = parts.slice(1, parts.length - 1).join(" ");
       const year = parseInt(parts[parts.length - 1], 10);
+      
       if (!Number.isNaN(day) && !Number.isNaN(year)) {
-        try { return new HDate(day, month, year); } catch {}
+        // Map month names to numbers (Nissan-based: Nissan=1, Tishrei=7)
+        const monthMap: Record<string, number> = {
+          'nissan': 1, 'iyar': 2, 'sivan': 3, 'tammuz': 4, 'av': 5, 'elul': 6,
+          'tishrei': 7, 'cheshvan': 8, 'kislev': 9, 'tevet': 10, 'teves': 10, 'shevat': 11, 'adar': 12,
+          'adar i': 12, 'adar ii': 13
+        };
+        
+        const monthNum = monthMap[monthName.toLowerCase()];
+        if (monthNum) {
+          try { 
+            const jd = new JewishDate();
+            jd.setJewishDate(year, monthNum, day);
+            return jd;
+          } catch {}
+        }
       }
     }
     return null;
   }
 
   function convert() {
-    const hd = parseHebrewDate(input);
-    if (!hd) {
+    const jd = parseHebrewDate(input);
+    if (!jd) {
       push(<Detail markdown={`# Hebrew → Gregorian
 
 **Error:** Could not parse "${input}".
 
 Examples:
 - \`7 Elul 5785\`
-- \`כ"ז בתמוז תשפ"ג\``} />);
+- \`26 Av 5784\`
+
+Supported months: Tishrei, Cheshvan, Kislev, Tevet, Shevat, Adar, Adar I, Adar II, Nissan, Iyar, Sivan, Tammuz, Av, Elul`} />);
       return;
     }
-    const date = hd.greg();
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
+    
+    const y = jd.getGregorianYear();
+    const m = jd.getGregorianMonth() + 1; // kosher-zmanim uses 0-based months
+    const d = jd.getGregorianDayOfMonth();
     const line = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const date = new Date(y, jd.getGregorianMonth(), d);
 
     push(
       <Detail

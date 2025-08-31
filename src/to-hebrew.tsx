@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Clipboard, Detail, Form, Icon, useNavigation, getPreferenceValues } from "@raycast/api";
 import { useState } from "react";
-import { HDate } from "@hebcal/hdate";
+import { JewishDate } from "kosher-zmanim";
 
 export default function Command() {
   const { afterSunsetShift } = getPreferenceValues<{ afterSunsetShift: boolean }>();
@@ -12,18 +12,19 @@ export default function Command() {
     if (afterSunsetShift) {
       d.setDate(d.getDate() + 1);
     }
-    const hd = new HDate(d);
-    const translit = `${hd.getDate()} ${hd.getMonthName()} ${hd.getFullYear()}`;
-    // @ts-ignore - some builds expose renderGematriya
-    const gematriya = hd.renderGematriya ? hd.renderGematriya() : translit;
-
+    const jd = new JewishDate();
+    jd.setGregorianDate(d.getFullYear(), d.getMonth(), d.getDate());
+    
+    const translit = jd.toString();
+    const gematriya = translit; // kosher-zmanim doesn't have gematriya rendering built-in
+    
     push(
       <Result
         title="Gregorian → Hebrew"
         lines={{
           "Transliterated": translit,
           "Gematriya": gematriya,
-          "Month (Tishrei-based #)": String(hd.getTishreiMonth()),
+          "Month (Jewish Calendar #)": String(jd.getJewishMonth()),
         }}
       />
     );

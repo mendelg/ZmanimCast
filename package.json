@@ -45,15 +45,14 @@
     },
     {
       "name": "zmanim-today",
-      "title": "Today's Zmanim",
-      "subtitle": "All zmanim for today with fuzzy search",
-      "description": "Shows all zmanim for today using your saved location. Searchable and copyable.",
+      "title": "Zmanim for Date",
+      "subtitle": "All zmanim for any date with fuzzy search",
+      "description": "Shows all zmanim for today (or pick a date) using your saved location. Searchable and copyable.",
       "mode": "view",
-      "keywords": ["zmanim", "today", "alos", "netz", "shkia", "tzais", "plag"]
+      "keywords": ["zmanim", "today", "alos", "netz", "shkia", "tzais", "plag", "date"]
     }
   ],
   "dependencies": {
-    "@hebcal/hdate": "^0.14.4",
     "@raycast/api": "^1.75.0",
     "fuse.js": "^7.0.0",
     "kosher-zmanim": "^0.6.0",
