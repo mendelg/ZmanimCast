@@ -4,7 +4,7 @@ import tzLookup from "tz-lookup";
 
 export default function SetupLocationCommand() {
   const [addrQuery, setAddrQuery] = useState("");
-  const [addrResults, setAddrResults] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
+  const [addrResults,  setAddrResults] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [lat, setLat] = useState("");
   const [lon, setLon] = useState("");
@@ -73,7 +73,7 @@ export default function SetupLocationCommand() {
       <Form.TextField 
         id="address" 
         title="Search Address" 
-        placeholder="e.g., Brooklyn, NY 11225" 
+        placeholder="e.g., Brooklyn, NY 11213" 
         value={addrQuery} 
         onChange={setAddrQuery} 
       />
@@ -106,7 +106,7 @@ export default function SetupLocationCommand() {
       <Form.TextField id="longitude" title="Longitude" value={lon} onChange={setLon} />
       <Form.TextField id="timeZoneId" title="Time Zone ID" value={tz} onChange={setTz} />
       
-      <Form.Description text="After saving, use 'Today's Zmanim' command to see all zmanim for today." />
+    <Form.Description text="After saving, use 'Zmanim for Date' to see all zmanim for today." />
     </Form>
   );
 }

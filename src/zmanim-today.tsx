@@ -108,6 +108,13 @@ export default function ZmanimTodayCommand() {
     return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "medium" }).format(d);
   }
 
+  function formatTimeOnly(s: string) {
+    if (!s || s === "N/A") return s;
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return s;
+    return new Intl.DateTimeFormat(undefined, { timeStyle: "short" }).format(d);
+  }
+
   const jsonPretty = useMemo(() => JSON.stringify(Object.fromEntries(filtered.map(p => [p.key, p.value])), null, 2), [filtered]);
 
   const dateStr = selectedDate.toLocaleDateString();
@@ -129,13 +136,13 @@ export default function ZmanimTodayCommand() {
             <List.Item
               key={p.key}
               title={p.key}
-              subtitle={p.value}
-              accessories={[{ text: formatLocal(p.value) }]}
+              subtitle={formatTimeOnly(p.value)}
               actions={
                 <ActionPanel>
                   <Action.CopyToClipboard title="Copy Time" content={p.value} />
                   <Action.CopyToClipboard title="Copy Name" content={p.key} />
                   <Action.CopyToClipboard title="Copy Name + Time" content={`${p.key}: ${p.value}`} />
+                  <Action.CopyToClipboard title="Copy Formatted" content={`${p.key}: ${formatLocal(p.value)}`} />
                   <Action
                     title="Change Date"
                     icon={Icon.Calendar}
@@ -171,3 +178,4 @@ export default function ZmanimTodayCommand() {
     </List>
   );
 }
+  

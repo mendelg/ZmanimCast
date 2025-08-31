@@ -46,7 +46,7 @@
     {
       "name": "zmanim-today",
       "title": "Zmanim for Date",
-      "subtitle": "All zmanim for any date with fuzzy search",
+      "subtitle": "All zmanim for any date.",
       "description": "Shows all zmanim for today (or pick a date) using your saved location. Searchable and copyable.",
       "mode": "view",
       "keywords": ["zmanim", "today", "alos", "netz", "shkia", "tzais", "plag", "date"]

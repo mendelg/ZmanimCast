@@ -1,12 +1,12 @@
 import { Action, ActionPanel, Detail, Form, Icon, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { JewishDate } from "kosher-zmanim";
+import { JewishCalendar, Parsha, Calendar } from "kosher-zmanim";
 
 export default function Command() {
   const [input, setInput] = useState<string>("");
   const { push } = useNavigation();
 
-  function parseHebrewDate(str: string): JewishDate | null {
+  function parseHebrewDate(str: string): JewishCalendar | null {
     const s = str.trim();
     if (!s) return null;
 
@@ -27,9 +27,9 @@ export default function Command() {
         const monthNum = monthMap[monthName.toLowerCase()];
         if (monthNum) {
           try { 
-            const jd = new JewishDate();
-            jd.setJewishDate(year, monthNum, day);
-            return jd;
+            const jc = new JewishCalendar();
+            jc.setJewishDate(year, monthNum, day);
+            return jc;
           } catch {}
         }
       }
@@ -38,8 +38,8 @@ export default function Command() {
   }
 
   function convert() {
-    const jd = parseHebrewDate(input);
-    if (!jd) {
+    const jc = parseHebrewDate(input);
+    if (!jc) {
       push(<Detail markdown={`# Hebrew → Gregorian
 
 **Error:** Could not parse "${input}".
@@ -52,23 +52,63 @@ Supported months: Tishrei, Cheshvan, Kislev, Tevet, Shevat, Adar, Adar I, Adar I
       return;
     }
     
-    const y = jd.getGregorianYear();
-    const m = jd.getGregorianMonth() + 1; // kosher-zmanim uses 0-based months
-    const d = jd.getGregorianDayOfMonth();
-    const line = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const date = new Date(y, jd.getGregorianMonth(), d);
+    const y = jc.getGregorianYear();
+    const m = jc.getGregorianMonth() + 1; // kosher-zmanim uses 0-based months
+    const d = jc.getGregorianDayOfMonth();
+    const gregorianDate = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const date = new Date(y, jc.getGregorianMonth(), d);
+    
+    // Get additional information
+    const dayNames = ['', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = dayNames[jc.getDayOfWeek()];
+    
+    // Get parsha info - only relevant for Saturday
+    const parshaNum = jc.getParsha();
+    let parshaInfo = '';
+    if (jc.getDayOfWeek() === 7) { // Saturday
+      parshaInfo = parshaNum > 0 ? Parsha[parshaNum].replace(/_/g, ' ') : 'None';
+    } else {
+      // For other days, find the upcoming Saturday's parsha
+      const nextSat = new JewishCalendar();
+      nextSat.setJewishDate(jc.getJewishYear(), jc.getJewishMonth(), jc.getJewishDayOfMonth());
+      const daysToSat = (7 - nextSat.getDayOfWeek()) % 7;
+      if (daysToSat === 0 && nextSat.getDayOfWeek() !== 7) { // If today is not Saturday, add 7 days
+        nextSat.forward(Calendar.DATE, 7);
+      } else if (daysToSat > 0) {
+        nextSat.forward(Calendar.DATE, daysToSat);
+      }
+      const nextParshaNum = nextSat.getParsha();
+      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} (this Shabbat)` : 'None this week';
+    }
+    
+    // Get special information
+    const specialInfo = [];
+    if (jc.isRoshChodesh()) specialInfo.push('Rosh Chodesh');
+    if (jc.isChanukah()) specialInfo.push(`Chanukah Day ${jc.getDayOfChanukah()}`);
+    if (jc.isYomTov()) specialInfo.push('Yom Tov');
+    if (jc.isTaanis()) specialInfo.push('Taanit');
+    if (jc.getDayOfOmer() > 0) specialInfo.push(`Omer Day ${jc.getDayOfOmer()}`);
+
+    const lines = [
+      `**Input:** ${input}`,
+      `**Gregorian Date:** ${gregorianDate}`,
+      `**Day of Week:** ${dayOfWeek}`,
+      `**Torah Portion:** ${parshaInfo}`,
+    ];
+    
+    if (specialInfo.length > 0) {
+      lines.push(`**Special Day:** ${specialInfo.join(', ')}`);
+    }
+    
+    lines.push('', '> Note: This returns the civil daytime date. Hebrew days begin at sunset.');
 
     push(
       <Detail
-        markdown={`# Hebrew → Gregorian
-
-**Input:** ${input}
-
-**Gregorian:** ${line}
-
-> Note: This returns the civil daytime date. Hebrew days begin at sunset.`}
+        markdown={`# Hebrew → Gregorian\n\n${lines.join('\n\n')}`}
         actions={<ActionPanel>
-          <Action.CopyToClipboard title="Copy Date (YYYY-MM-DD)" content={line} />
+          <Action.CopyToClipboard title="Copy Date (YYYY-MM-DD)" content={gregorianDate} />
+          <Action.CopyToClipboard title="Copy Day of Week" content={dayOfWeek} />
+          <Action.CopyToClipboard title="Copy Torah Portion" content={parshaInfo} />
           <Action.CopyToClipboard title="Copy ISO Date" content={date.toISOString()} icon={Icon.Clipboard} />
         </ActionPanel>}
       />
