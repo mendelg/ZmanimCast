@@ -35,7 +35,7 @@ export default function Command() {
         nextSat.forward(Calendar.DATE, daysToSat);
       }
       const nextParshaNum = nextSat.getParsha();
-      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} (this Shabbat)` : 'None this week';
+      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} (this Shabbat will be)` : 'None this week';
     }
     
     // Get special information

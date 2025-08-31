@@ -78,7 +78,8 @@ Supported months: Tishrei, Cheshvan, Kislev, Tevet, Shevat, Adar, Adar I, Adar I
         nextSat.forward(Calendar.DATE, daysToSat);
       }
       const nextParshaNum = nextSat.getParsha();
-      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} (this Shabbat)` : 'None this week';
+
+     parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} ()` : 'None this week';
     }
     
     // Get special information
