@@ -139,10 +139,10 @@ export default function ZmanimTodayCommand() {
               subtitle={formatTimeOnly(p.value)}
               actions={
                 <ActionPanel>
-                  <Action.CopyToClipboard title="Copy Time" content={p.value} />
+                  <Action.CopyToClipboard title="Copy Time" content={formatTimeOnly(p.value)} />
+                  <Action.CopyToClipboard title="Copy Name + Time" content={`${p.key}: ${formatTimeOnly(p.value)}`} />
                   <Action.CopyToClipboard title="Copy Name" content={p.key} />
-                  <Action.CopyToClipboard title="Copy Name + Time" content={`${p.key}: ${p.value}`} />
-                  <Action.CopyToClipboard title="Copy Formatted" content={`${p.key}: ${formatLocal(p.value)}`} />
+                  <Action.CopyToClipboard title="Copy Full DateTime" content={p.value} />
                   <Action
                     title="Change Date"
                     icon={Icon.Calendar}
