@@ -93,8 +93,7 @@ Please check that:
       }
       const nextParshaNum = nextSat.getParsha();
 
-      parshaInfo =
-        nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, " ")} (On Shabbat)` : "None this week";
+      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, " ")} (On Shabbat)` : "None this week";
     }
 
     // Get special information
