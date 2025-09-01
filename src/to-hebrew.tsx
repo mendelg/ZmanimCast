@@ -35,7 +35,7 @@ export default function Command() {
         nextSat.forward(Calendar.DATE, daysToSat);
       }
       const nextParshaNum = nextSat.getParsha();
-      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} (this Shabbat will be)` : 'None this week';
+      parshaInfo = nextParshaNum > 0 ? `${Parsha[nextParshaNum].replace(/_/g, ' ')} (Shabbat will be)` : 'None this week';
     }
     
     // Get special information
@@ -74,7 +74,7 @@ export default function Command() {
         value={afterSunset} 
         onChange={setAfterSunset} 
       />
-      <Form.Description text="Check 'After Sunset' if you want to get tomorrow's Hebrew date (Hebrew days begin at sunset)." />
+      <Form.Description text="Check 'After Sunset' if you want to get next day's Hebrew date (since Hebrew days begin at sunset)." />
     </Form>
   );
 }

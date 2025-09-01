@@ -2,53 +2,61 @@ import { Action, ActionPanel, Detail, Form, Icon, useNavigation } from "@raycast
 import { useState } from "react";
 import { JewishCalendar, Parsha, Calendar } from "kosher-zmanim";
 
+const HEBREW_MONTHS = [
+  { name: "Nissan", value: 1 },
+  { name: "Iyar", value: 2 },
+  { name: "Sivan", value: 3 },
+  { name: "Tammuz", value: 4 },
+  { name: "Av", value: 5 },
+  { name: "Elul", value: 6 },
+  { name: "Tishrei", value: 7 },
+  { name: "Cheshvan", value: 8 },
+  { name: "Kislev", value: 9 },
+  { name: "Tevet", value: 10 },
+  { name: "Shevat", value: 11 },
+  { name: "Adar", value: 12 },
+  { name: "Adar II", value: 13 },
+];
+
 export default function Command() {
-  const [input, setInput] = useState<string>("");
+  // Get today's Hebrew date as defaults
+  const todayHebrew = new JewishCalendar();
+  todayHebrew.setGregorianDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  
+  const [day, setDay] = useState<string>(todayHebrew.getJewishDayOfMonth().toString());
+  const [month, setMonth] = useState<string>(todayHebrew.getJewishMonth().toString());
+  const [year, setYear] = useState<string>(todayHebrew.getJewishYear().toString());
   const { push } = useNavigation();
 
-  function parseHebrewDate(str: string): JewishCalendar | null {
-    const s = str.trim();
-    if (!s) return null;
-
-    const parts = s.replace(/[,:\-/]/g, " ").split(" ").filter(Boolean);
-    if (parts.length >= 3) {
-      const day = parseInt(parts[0], 10);
-      const monthName = parts.slice(1, parts.length - 1).join(" ");
-      const year = parseInt(parts[parts.length - 1], 10);
-      
-      if (!Number.isNaN(day) && !Number.isNaN(year)) {
-        // Map month names to numbers (Nissan-based: Nissan=1, Tishrei=7)
-        const monthMap: Record<string, number> = {
-          'nissan': 1, 'iyar': 2, 'sivan': 3, 'tammuz': 4, 'av': 5, 'elul': 6,
-          'tishrei': 7, 'cheshvan': 8, 'kislev': 9, 'tevet': 10, 'teves': 10, 'shevat': 11, 'adar': 12,
-          'adar i': 12, 'adar ii': 13
-        };
-        
-        const monthNum = monthMap[monthName.toLowerCase()];
-        if (monthNum) {
-          try { 
-            const jc = new JewishCalendar();
-            jc.setJewishDate(year, monthNum, day);
-            return jc;
-          } catch {}
-        }
-      }
+  function createHebrewDate(): JewishCalendar | null {
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return null;
+    if (dayNum < 1 || dayNum > 30) return null;
+    if (yearNum < 1) return null;
+    
+    try {
+      const jc = new JewishCalendar();
+      jc.setJewishDate(yearNum, monthNum, dayNum);
+      return jc;
+    } catch {
+      return null;
     }
-    return null;
   }
 
   function convert() {
-    const jc = parseHebrewDate(input);
+    const jc = createHebrewDate();
     if (!jc) {
       push(<Detail markdown={`# Hebrew → Gregorian
 
-**Error:** Could not parse "${input}".
+**Error:** Invalid Hebrew date: ${day} ${HEBREW_MONTHS.find(m => m.value.toString() === month)?.name} ${year}
 
-Examples:
-- \`7 Elul 5785\`
-- \`26 Av 5784\`
-
-Supported months: Tishrei, Cheshvan, Kislev, Tevet, Shevat, Adar, Adar I, Adar II, Nissan, Iyar, Sivan, Tammuz, Av, Elul`} />);
+Please check that:
+- Day is between 1-30
+- Month is selected
+- Year is a valid Hebrew year (e.g., 5785)`} />);
       return;
     }
     
@@ -90,8 +98,9 @@ Supported months: Tishrei, Cheshvan, Kislev, Tevet, Shevat, Adar, Adar I, Adar I
     if (jc.isTaanis()) specialInfo.push('Taanit');
     if (jc.getDayOfOmer() > 0) specialInfo.push(`Omer Day ${jc.getDayOfOmer()}`);
 
+    const inputDisplay = `${day} ${HEBREW_MONTHS.find(m => m.value.toString() === month)?.name} ${year}`;
     const lines = [
-      `**Input:** ${input}`,
+      `**Input:** ${inputDisplay}`,
       `**Gregorian Date:** ${gregorianDate}`,
       `**Day of Week:** ${dayOfWeek}`,
       `**Torah Portion:** ${parshaInfo}`,
@@ -118,8 +127,31 @@ Supported months: Tishrei, Cheshvan, Kislev, Tevet, Shevat, Adar, Adar I, Adar I
 
   return (
     <Form actions={<ActionPanel><Action.SubmitForm title="Convert" onSubmit={convert} icon={Icon.ArrowRight} /></ActionPanel>}>
-      <Form.TextField id="hebrew" title="Hebrew Date" placeholder="e.g., 7 Elul 5785 or כ״ז בתמוז תשפ״ג" value={input} onChange={setInput} />
-      <Form.Description text="Supported: English months (including Adar II) or Hebrew gematriya strings." />
+      <Form.TextField 
+        id="day" 
+        title="Day" 
+        placeholder="1-30" 
+        value={day} 
+        onChange={setDay} 
+      />
+      <Form.Dropdown 
+        id="month" 
+        title="Hebrew Month" 
+        value={month} 
+        onChange={setMonth}
+      >
+        {HEBREW_MONTHS.map((m) => (
+          <Form.Dropdown.Item key={m.value} value={m.value.toString()} title={m.name} />
+        ))}
+      </Form.Dropdown>
+      <Form.TextField 
+        id="year" 
+        title="Hebrew Year" 
+        placeholder="e.g., 5785" 
+        value={year} 
+        onChange={setYear} 
+      />
+      <Form.Description text="Enter a Hebrew date to convert to Gregorian. Defaults to today's Hebrew date." />
     </Form>
   );
 }
