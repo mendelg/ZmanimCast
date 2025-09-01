@@ -98,12 +98,6 @@ A comprehensive Raycast extension for Hebrew/Jewish calendar conversions and zma
 - **OpenStreetMap Nominatim** - Address geocoding for location setup
 - **tz-lookup** - Automatic timezone detection from coordinates
 
-### Accuracy
-- Zmanim calculations use precise astronomical algorithms
-- Location-based calculations account for elevation and geographic coordinates
-- Supports complex zmanim including seasonal hour calculations
-- Hebrew calendar calculations handle leap years and all edge cases
-
 ## Development
 
 ```bash
@@ -128,4 +122,4 @@ This extension leverages the powerful **KosherJava** library for accurate Hebrew
 
 ## License
 
-MIT
+**MIT**
