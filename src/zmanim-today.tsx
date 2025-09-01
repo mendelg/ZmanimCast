@@ -97,7 +97,7 @@ export default function ZmanimTodayCommand() {
       }
 
       if (data?.Zmanim) {
-        for (const [k, v] of Object.entries<string>(data.Zmanim)) {
+        for (const [k, v] of Object.entries(data.Zmanim)) {
           entries.push({ key: k, value: String(v) });
         }
       }
