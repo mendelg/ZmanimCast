@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "ZmanimCast",
+  "name": "hebrew-date-zmanim",
   "title": "Hebrew Date & Zmanim",
   "description": "Hebrew date converter + full Kosher Zmanim with fuzzy search for Raycast.",
   "icon": "extension-icon.png",

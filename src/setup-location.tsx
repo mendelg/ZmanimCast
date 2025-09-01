@@ -68,7 +68,7 @@ export default function SetupLocationCommand() {
 
   return (
     <Form actions={<ActionPanel><Action.SubmitForm title="Save Location" onSubmit={saveLocation} /></ActionPanel>}>
-      <Form.Description text="Search for your address or enter coordinates manually." />
+      <Form.Description text="Search for your address." />
       
       <Form.TextField 
         id="address" 
@@ -78,10 +78,14 @@ export default function SetupLocationCommand() {
         onChange={setAddrQuery} 
       />
       
+       {addrQuery.trim() && !addrResults.length && !isSearching && (
+        <Form.Description text="No matching addresses found. Try a different search term." />
+      )}
+      
       {!!addrResults.length && (
         <Form.Dropdown 
           id="addressResults" 
-          title={isSearching ? "Matching Addresses (searching…)" : "Matching Addresses"} 
+          title={isSearching ? "Select from Matching Addresses (searching…)" : `Select from ${addrResults.length} Matching Addresses`} 
           storeValue={false} 
           onChange={(val) => {
             const [lt, ln, name] = val.split("|");
@@ -100,6 +104,9 @@ export default function SetupLocationCommand() {
           ))}
         </Form.Dropdown>
       )}
+      
+      <Form.Separator />
+      <Form.Description text="Selected Location Details:" />
       
       <Form.TextField id="locationName" title="Location Name" value={locationName} onChange={setLocationName} />
       <Form.TextField id="latitude" title="Latitude" value={lat} onChange={setLat} />

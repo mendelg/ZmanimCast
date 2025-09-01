@@ -52,7 +52,7 @@ export default function ZmanimTodayCommand() {
     setIsLoading(true);
     try {
       const stored = await LocalStorage.getItem<string>("zmanim:lastLocation");
-      if (!stored) throw new Error("No saved location. Open 'Setup Location' and select an address first.");
+      if (!stored) throw new Error("No saved location. Open the 'Setup Location' command and select an address first.");
       
       const { locationName, lat, lon, tz } = JSON.parse(stored) as { locationName: string; lat: number; lon: number; tz: string };
       setLocationName(locationName);

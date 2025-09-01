@@ -61,7 +61,7 @@ A comprehensive Raycast extension for Hebrew/Jewish calendar conversions and zma
 
 #### Setup Location (One-time)
 1. Open Raycast and type "Setup Location"
-2. Search for your address (e.g., "Brooklyn, NY 11225")
+2. Search for your address (e.g., "Brooklyn, NY 11213")
 3. Select your location from the results
 4. Location is saved automatically for future use
 
