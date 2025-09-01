@@ -14,7 +14,7 @@ function DatePickerForm({ onDateSelect }: { onDateSelect: (date: Date) => void }
   }
 
   return (
-    <Form 
+    <Form
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Select Date" onSubmit={handleSubmit} icon={Icon.Calendar} />
@@ -32,7 +32,6 @@ function DatePickerForm({ onDateSelect }: { onDateSelect: (date: Date) => void }
   );
 }
 
-
 export default function ZmanimTodayCommand() {
   const [allPairs, setAllPairs] = useState<{ key: string; value: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +39,10 @@ export default function ZmanimTodayCommand() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { push } = useNavigation();
 
-  const fuse = useMemo(() => new Fuse(allPairs, { includeScore: true, threshold: 0.4, keys: ["key", "value"] }), [allPairs]);
+  const fuse = useMemo(
+    () => new Fuse(allPairs, { includeScore: true, threshold: 0.4, keys: ["key", "value"] }),
+    [allPairs],
+  );
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -53,45 +55,60 @@ export default function ZmanimTodayCommand() {
     try {
       const stored = await LocalStorage.getItem<string>("zmanim:lastLocation");
       if (!stored) throw new Error("No saved location. Open the 'Setup Location' command and select an address first.");
-      
-      const { locationName, lat, lon, tz } = JSON.parse(stored) as { locationName: string; lat: number; lon: number; tz: string };
+
+      const { locationName, lat, lon, tz } = JSON.parse(stored) as {
+        locationName: string;
+        lat: number;
+        lon: number;
+        tz: string;
+      };
       setLocationName(locationName);
-      
-      const opts = { 
-        date: selectedDate, 
-        locationName, 
-        latitude: lat, 
-        longitude: lon, 
-        timeZoneId: tz, 
-        elevation: 0, 
+
+      const opts = {
+        date: selectedDate,
+        locationName,
+        latitude: lat,
+        longitude: lon,
+        timeZoneId: tz,
+        elevation: 0,
         //todo: make this configurable
-        complexZmanim: true 
-      } as any;
-      
+        complexZmanim: true,
+      } as {
+        date: Date;
+        locationName: string;
+        latitude: number;
+        longitude: number;
+        timeZoneId: string;
+        elevation: number;
+        complexZmanim: boolean;
+      };
+
       const data = await getZmanimJson(opts);
       const selectedJd = new JewishDate();
       selectedJd.setGregorianDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       const hebrewDate = selectedJd.toString();
-      
-      const entries: { key: string; value: string }[] = [
-        { key: "Hebrew Date", value: hebrewDate }
-      ];
-      
+
+      const entries: { key: string; value: string }[] = [{ key: "Hebrew Date", value: hebrewDate }];
+
       if (data?.metadata) {
         for (const [k, v] of Object.entries(data.metadata)) {
           entries.push({ key: `meta:${k}`, value: String(v) });
         }
       }
-      
+
       if (data?.Zmanim) {
-        for (const [k, v] of Object.entries<any>(data.Zmanim)) {
+        for (const [k, v] of Object.entries<string>(data.Zmanim)) {
           entries.push({ key: k, value: String(v) });
         }
       }
-      
+
       setAllPairs(entries);
-    } catch (e: any) {
-      await showToast({ style: Toast.Style.Failure, title: "Failed to load zmanim", message: String(e?.message || e) });
+    } catch (e: unknown) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Failed to load zmanim",
+        message: String(e instanceof Error ? e.message : e),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -101,13 +118,6 @@ export default function ZmanimTodayCommand() {
     loadZmanim();
   }, [selectedDate]);
 
-  function formatLocal(s: string) {
-    if (!s || s === "N/A") return s;
-    const d = new Date(s);
-    if (isNaN(d.getTime())) return s;
-    return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "medium" }).format(d);
-  }
-
   function formatTimeOnly(s: string) {
     if (!s || s === "N/A") return s;
     const d = new Date(s);
@@ -115,19 +125,21 @@ export default function ZmanimTodayCommand() {
     return new Intl.DateTimeFormat(undefined, { timeStyle: "short" }).format(d);
   }
 
-  const jsonPretty = useMemo(() => JSON.stringify(Object.fromEntries(filtered.map(p => [p.key, p.value])), null, 2), [filtered]);
+  const jsonPretty = useMemo(
+    () => JSON.stringify(Object.fromEntries(filtered.map((p) => [p.key, p.value])), null, 2),
+    [filtered],
+  );
 
   const dateStr = selectedDate.toLocaleDateString();
   const isToday = selectedDate.toDateString() === new Date().toDateString();
 
   return (
-    <List 
+    <List
       isLoading={isLoading}
-      searchBarPlaceholder="Search zmanim… (e.g., alos, netz, shkia, tzais)" 
-      onSearchTextChange={setQuery} 
-      searchText={query} 
+      searchBarPlaceholder="Search zmanim… (e.g., alos, netz, shkia, tzais)"
+      onSearchTextChange={setQuery}
+      searchText={query}
       throttle
-
     >
       <List.Section title={`${isToday ? "Today's" : dateStr} Zmanim${locationName ? ` - ${locationName}` : ""}`}>
         {filtered
@@ -142,7 +154,7 @@ export default function ZmanimTodayCommand() {
                   <Action.CopyToClipboard title="Copy Time" content={formatTimeOnly(p.value)} />
                   <Action.CopyToClipboard title="Copy Name + Time" content={`${p.key}: ${formatTimeOnly(p.value)}`} />
                   <Action.CopyToClipboard title="Copy Name" content={p.key} />
-                  <Action.CopyToClipboard title="Copy Full DateTime" content={p.value} />
+                  <Action.CopyToClipboard title="Copy Full Datetime" content={p.value} />
                   <Action
                     title="Change Date"
                     icon={Icon.Calendar}
@@ -154,7 +166,7 @@ export default function ZmanimTodayCommand() {
             />
           ))}
       </List.Section>
-      
+
       <List.Section title="Metadata">
         {filtered
           .filter((p) => p.key.startsWith("meta:"))
@@ -163,19 +175,26 @@ export default function ZmanimTodayCommand() {
               key={p.key}
               title={p.key.replace(/^meta:/, "")}
               subtitle={p.value}
-              actions={<ActionPanel><Action.CopyToClipboard title="Copy" content={`${p.key}: ${p.value}`} /></ActionPanel>}
+              actions={
+                <ActionPanel>
+                  <Action.CopyToClipboard title="Copy" content={`${p.key}: ${p.value}`} />
+                </ActionPanel>
+              }
             />
           ))}
       </List.Section>
-      
+
       <List.Section title="Actions">
         <List.Item
           title="Copy All as JSON"
           subtitle="Copy all filtered results as JSON"
-          actions={<ActionPanel><Action.CopyToClipboard title="Copy JSON" content={jsonPretty} /></ActionPanel>}
+          actions={
+            <ActionPanel>
+              <Action.CopyToClipboard title="Copy JSON" content={jsonPretty} />
+            </ActionPanel>
+          }
         />
       </List.Section>
     </List>
   );
 }
-  
